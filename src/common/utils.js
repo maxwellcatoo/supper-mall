@@ -1,3 +1,10 @@
-export  function sum(a,b){
-    return a + b
-}
+
+    export function debounce(func,delay) {
+        let timer = null;
+        return function(...args) {
+            if (timer) clearTimeout(timer);
+            timer = setTimeout(() => {
+                func.apply(this,...args)
+            },delay)
+        }
+    }

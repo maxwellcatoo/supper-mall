@@ -2,7 +2,7 @@
     <swiper>
         <swiper-item v-for="item in banners">
             <a :href="item.link">
-                <img :src="item.image" alt="图片未正常显示">
+                <img :src="item.image" alt="图片未正常显示" @load="imgOnload">
             </a>
         </swiper-item>
     </swiper>
@@ -10,10 +10,23 @@
 
 <script>
     import {Swiper,SwiperItem} from '../../../components/common/swiper/index'
-    import {getHomeMultidate} from "../../../network/home";
 
     export default {
         name: "HomeSwiper",
+        data() {
+            return {
+                isLoad: false
+            }
+        },
+        methods: {
+            imgOnload() {
+                if(!this.isLoad){
+                    this.$emit('swiperImg')
+                    this.isLoad = true
+                }
+
+            }
+        },
         components: {
             Swiper,
             SwiperItem

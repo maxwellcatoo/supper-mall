@@ -3,12 +3,26 @@
     <nav-bar class="home-nav">
       <div slot="center">购物街</div>
     </nav-bar>
-    <home-swiper :banners="banners"></home-swiper>
-    <recommend-view :recommends="recommends"></recommend-view>
-    <future-view></future-view>
-    <tab-control :titles="['流行','新款','精选']" class="tab-control"
-    @tabClick="tabClick"></tab-control>
-    <goods-list :goods="showGoods"></goods-list>
+    <tab-control :titles="['流行','新款','精选']"
+                 @tabClick="tabClick"
+                 :class="{aactive:swiperIsShow}"
+                 ref="tabControl2" >
+    </tab-control>
+    <scroll class="content" ref="scroll"
+            :probeType=3
+            :pull-up-load="true"
+            @scroll="scroll" @pullingUp="loadMore">
+      <home-swiper :banners="banners"
+                   @swiperImg="swiperImg"></home-swiper>
+      <recommend-view :recommends="recommends"></recommend-view>
+      <future-view></future-view>
+      <tab-control :titles="['流行','新款','精选']"
+                   @tabClick="tabClick"
+                   ref="tabControl" >
+      </tab-control>
+      <goods-list :goods="showGoods"></goods-list>
+    </scroll>
+    <back-top class="back-top" @click.native="backClick" v-show="isShow"></back-top>
   </div>
 </template>
 
@@ -23,8 +37,11 @@
     import TabControl from "../../components/content/tabContral/TabContral";
     import GoodsList from "../../components/content/goods/GoodsList";
     import GoodsListItem from "../../components/content/goods/GoodsListItem";
+    import Scroll from "../../components/common/scroll/Scroll";
+    import BackTop from "../../components/content/backTop/BackTop";
 
     import {getHomeMultiData,getHomeGoods} from "../../network/home";
+    import {debounce} from "../../common/utils";
 
     export default {
         name: "Home",
@@ -37,6 +54,8 @@
           TabControl,
           GoodsList,
           GoodsListItem,
+          Scroll,
+          BackTop
 
         },
       data(){
@@ -48,8 +67,11 @@
             new: {page: 0,list: []},
             sell: {page: 0,list: []}
           },
-          currentType: 'pop'
-
+          currentType: 'pop',
+          isShow: false,
+          scrollHeight: 0,
+          swiperIsShow: false,
+          saveY: 0
         }
       },
       computed: {
@@ -63,6 +85,21 @@
         this.getHomeGoods('pop')
         this.getHomeGoods('new')
         this.getHomeGoods('sell')
+
+      },
+      mounted() {
+        const refresh = debounce(this.$refs.scroll.refresh,50);
+        this.$bus.$on('itemImgOnload',() => {
+          refresh()
+        });
+      },
+      activated() {
+          this.$refs.scroll.refresh();
+          this.$refs.scroll.scroll.scrollTo(0,this.saveY);
+
+      },
+      deactivated() {
+          this.saveY = this.$refs.scroll.scroll.y
       },
       methods: {
         /**
@@ -74,6 +111,26 @@
             case 1: this.currentType = 'new';break;
             case 2: this.currentType = 'sell';break;
           }
+          this.$refs.tabControl2.currentIndex = index
+          this.$refs.tabControl.currentIndex = index
+        },
+        backClick() {
+          this.$refs.scroll.BackScroll(0,0,500)
+        },
+        scroll(position) {
+          //1.监听滚动条位置，是否显示上拉图标
+          this.isShow = position.y < -1000
+          //2.监听滚动条位置，对swiper实现吸顶效果
+          this.swiperIsShow = -position.y>this.scrollHeight
+          // console.log(this.swiperIsShow)
+        },
+        loadMore() {
+          // console.log('xia')
+          this.getHomeGoods(this.currentType)
+          this.$refs.scroll.scroll.finishPullUp()
+        },
+        swiperImg() {
+          this.scrollHeight = this.$refs.tabControl.$el.offsetTop
         },
         /**
         *网络请求相关方法
@@ -92,7 +149,8 @@
             this.goods[type].list.push(...res.data.data.list)
             this.goods[type].page += 1
           })
-        }
+        },
+
       }
     }
 </script>
@@ -103,11 +161,33 @@
     color: #fff;
   }
   #home {
-    padding-top: 44px;
+    height: 100vh;
   }
-  .tab-control {
-    position: sticky;
+  .content {
+    height: calc(100% - 93px);
+    overflow: hidden;
+
+    position: absolute;
     top: 44px;
+    bottom: 49px;
+  }
+  /*.content {*/
+  /*  margin-top: 44px;*/
+  /*  height: calc(100% - 93px);*/
+  /*  overflow: hidden;*/
+  /*}*/
+  .aactive {
+    position: fixed;
+    top: 44px;
+    left: 0;
+    right: 0;
+    z-index: 5;
+  }
+  .tab-control1 {
+    position: fixed;
     z-index: 9;
+    top: 44px;
+    right: 0;
+    left: 0;
   }
 </style>

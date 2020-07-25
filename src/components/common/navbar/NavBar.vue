@@ -22,6 +22,8 @@
         top: 0;
         left: 0;
         right: 0;
+        box-shadow: 0 0 2px 1px #eee;
+        background-color: var(--color-background);
     }
 
     .left, .right {

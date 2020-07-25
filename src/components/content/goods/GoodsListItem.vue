@@ -1,6 +1,8 @@
 <template>
     <div class="goods-item">
-        <img :src="goodsItem.show.img" alt="图片无法显示">
+        <img :src="goodsItem.show.img" alt="图片无法显示"
+             @click="pageJump"
+             @load="imgOnload">
         <div class="goods-info">
             <p>{{goodsItem.title}}</p>
             <span class="price">{{goodsItem.price}}</span>
@@ -19,6 +21,15 @@
                     return {}
                 }
             }
+        },
+        methods: {
+            imgOnload() {
+                this.$bus.$emit('itemImgOnload')
+            },
+            pageJump() {
+                this.$router.push('/detail/' + this.goodsItem.iid)
+            }
+
         }
     }
 </script>
