@@ -30,6 +30,7 @@
             this.scroll = new BScroll(this.$refs.wrapper,{
                 probeType: this.probeType,
                 click: true,
+                useTransition: false,
                 pullUpLoad: this.pullUpLoad
             })
             this.scroll.on('scroll',(position) => {

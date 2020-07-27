@@ -33,6 +33,7 @@
         methods: {
             detailClick(index) {
                 this.currentIndex = index
+                this.$emit("navBarClick",index)
             },
             detailBack() {
                 this.$router.back()

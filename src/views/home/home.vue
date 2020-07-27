@@ -42,6 +42,7 @@
 
     import {getHomeMultiData,getHomeGoods} from "../../network/home";
     import {debounce} from "../../common/utils";
+    import {itemListenerMixin,backTop} from "../../common/mixin"
 
     export default {
         name: "Home",
@@ -56,8 +57,8 @@
           GoodsListItem,
           Scroll,
           BackTop
-
         },
+      mixins: [itemListenerMixin,backTop],
       data(){
         return {
           banners: [],
@@ -71,7 +72,7 @@
           isShow: false,
           scrollHeight: 0,
           swiperIsShow: false,
-          saveY: 0
+          saveY: 0,
         }
       },
       computed: {
@@ -85,21 +86,18 @@
         this.getHomeGoods('pop')
         this.getHomeGoods('new')
         this.getHomeGoods('sell')
-
       },
       mounted() {
-        const refresh = debounce(this.$refs.scroll.refresh,50);
-        this.$bus.$on('itemImgOnload',() => {
-          refresh()
-        });
       },
+      //记录跳转到其他页面时本页面的滑动条位置
       activated() {
           this.$refs.scroll.refresh();
           this.$refs.scroll.scroll.scrollTo(0,this.saveY);
-
       },
       deactivated() {
-          this.saveY = this.$refs.scroll.scroll.y
+          this.saveY = this.$refs.scroll.scroll.y;
+
+          this.$bus.$off('itemImgOnload',this.busLoad);
       },
       methods: {
         /**
