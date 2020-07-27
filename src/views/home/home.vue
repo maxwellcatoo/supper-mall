@@ -69,7 +69,7 @@
             sell: {page: 0,list: []}
           },
           currentType: 'pop',
-          isShow: false,
+          // isShow: false,
           scrollHeight: 0,
           swiperIsShow: false,
           saveY: 0,
@@ -112,12 +112,13 @@
           this.$refs.tabControl2.currentIndex = index
           this.$refs.tabControl.currentIndex = index
         },
-        backClick() {
-          this.$refs.scroll.BackScroll(0,0,500)
-        },
+        // backClick() {
+        //   this.$refs.scroll.BackScroll(0,0,500)
+        // },
         scroll(position) {
           //1.监听滚动条位置，是否显示上拉图标
-          this.isShow = position.y < -1000
+          // this.isShow = position.y < -1000
+          this.listenShowBackTop(position)
           //2.监听滚动条位置，对swiper实现吸顶效果
           this.swiperIsShow = -position.y>this.scrollHeight
           // console.log(this.swiperIsShow)

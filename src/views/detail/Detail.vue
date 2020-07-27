@@ -1,7 +1,7 @@
 <template>
     <div id="detail" name="detail">
         <detail-nav-bar @navBarClick="navBarClick" ref="navBar"></detail-nav-bar>
-        <scroll :probeType=3 class="content" id="scroll" ref="scroll" @scroll="navChange">
+        <scroll :probeType=3 class="content" id="scroll" ref="scroll" @scroll="scroll">
             <detail-swiper :topImages="topImages"></detail-swiper>
             <detail-base-info :goods="goods"></detail-base-info>
             <detail-shop-info :shop="shop"></detail-shop-info>
@@ -12,6 +12,7 @@
             </detail-comment-info>
             <goods-list :goods="recommend" ref="goods"/>
         </scroll>
+
         <back-top class="back-top" @click.native="backClick" v-show="isShow"></back-top>
         <detail-bottom-bar class="bottom"/>
     </div>
@@ -28,7 +29,7 @@
     import DetailCommentInfo from "./childComps/DetailCommentInfo";
     import GoodsList from "../../components/content/goods/GoodsList";
     import DetailBottomBar from "./childComps/DetailBottomBar";
-    import BackTop from "../../components/content/backTop/BackTop";
+    // import BackTop from "../../components/content/backTop/BackTop";
 
     import {getDetail,getRecommend,Goods,Shop,GoodsParam} from "../../network/detail"
     import {debounce} from "../../common/utils";
@@ -47,7 +48,7 @@
             DetailCommentInfo,
             GoodsList,
             DetailBottomBar,
-            BackTop
+            // BackTop
         },
         mixins: [itemListenerMixin,backTop],
         data() {
@@ -61,7 +62,9 @@
                 commentInfo: {},
                 recommend: [],
                 detailNavBar: [],
-                currentIndex: 0
+                currentIndex: 0,
+                // isShow: false,
+                // scrollHeight: 0,
             }
         },
         methods: {
@@ -83,28 +86,27 @@
                 this.$refs.scroll.scroll.scrollTo(0,-this.detailNavBar[index]-44,200)
                 // console.log(index)
             },
-            navChange() {
+            scroll(position) {
                 let scrollY = -this.$refs.scroll.scroll.y-44;
                 let length = this.detailNavBar.length
                 // console.log(scrollY)
                 for(let i in this.detailNavBar) {
                     i = i-0
                     if(i !== this.currentIndex){
-                        if(i !== length-1 && scrollY>this.detailNavBar[i] && scrollY<this.detailNavBar[i+1] || i === length-1 && scrollY>this.detailNavBar[i]){
+                        if(i !== length-1 && scrollY>=this.detailNavBar[i] && scrollY<this.detailNavBar[i+1] || i === length-1 && scrollY>=this.detailNavBar[i]){
                             this.currentIndex = i
                             this.$refs.navBar.currentIndex = this.currentIndex
                             // console.log(this.currentIndex)
                         }
                     }
                 }
+                // this.isShow = this.$refs.scroll.scroll.y < -1000
+                this.listenShowBackTop(position)
             },
-            backClick() {
-                this.$refs.scroll.BackScroll(0,0,500)
-            },
-            scroll(position) {
-                //1.监听滚动条位置，是否显示上拉图标
-                this.isShow = position.y < -1000
-            }
+
+            // backClick() {
+            //     this.$refs.scroll.BackScroll(0,0,500)
+            // },
         },
         created() {
             //保存传入的iid
@@ -152,10 +154,10 @@
         /*height: calc(100% - 44px);*/
         overflow: hidden;
 
-        position: fixed;
+        position: absolute;
         top: 44px;
         bottom: 58px;
-        z-index: 11;
+        /*z-index: 11;*/
         background-color: var(--color-background);
     }
     .bottom {
@@ -167,7 +169,7 @@
     }
     .back-top {
         position: fixed;
-        bottom: 65px;
+        bottom: 60px;
         right: 10px;
         z-index: 15;
     }
