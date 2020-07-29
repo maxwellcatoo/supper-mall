@@ -1,6 +1,6 @@
 <template>
     <div class="goods-item">
-        <img :src="showImage" alt="图片无法显示"
+        <img v-lazy="showImage" alt="图片无法显示"
              @click="pageJump"
              @load="imgOnload">
         <div class="goods-info">

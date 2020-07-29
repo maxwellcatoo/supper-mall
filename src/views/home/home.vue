@@ -88,6 +88,7 @@
         this.getHomeGoods('sell')
       },
       mounted() {
+            // console.log(this.$refs.scroll.scroll.scrollTo)
       },
       //记录跳转到其他页面时本页面的滑动条位置
       activated() {

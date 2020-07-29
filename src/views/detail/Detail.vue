@@ -14,7 +14,8 @@
         </scroll>
 
         <back-top class="back-top" @click.native="backClick" v-show="isShow"></back-top>
-        <detail-bottom-bar class="bottom"/>
+        <detail-bottom-bar class="bottom" @addToCart="addCart"/>
+<!--			<toast :message="message" :show="show"/>-->
     </div>
 </template>
 
@@ -30,10 +31,12 @@
     import GoodsList from "../../components/content/goods/GoodsList";
     import DetailBottomBar from "./childComps/DetailBottomBar";
     // import BackTop from "../../components/content/backTop/BackTop";
+		// import Toast from "../../components/common/toast/Toast";
 
     import {getDetail,getRecommend,Goods,Shop,GoodsParam} from "../../network/detail"
     import {debounce} from "../../common/utils";
     import {itemListenerMixin,backTop} from "../../common/mixin"
+		import { mapActions } from 'vuex'
 
     export default {
         name: "Detail",
@@ -48,7 +51,8 @@
             DetailCommentInfo,
             GoodsList,
             DetailBottomBar,
-            // BackTop
+            // BackTop,
+            // Toast
         },
         mixins: [itemListenerMixin,backTop],
         data() {
@@ -65,9 +69,12 @@
                 currentIndex: 0,
                 // isShow: false,
                 // scrollHeight: 0,
+								// message: '',
+								// show: false
             }
         },
         methods: {
+            ...mapActions(['addToCart']),
             goodsInfoOnload() {
                 // 当有图片传进来时，使用防抖和refresh对scroll计算的滚动高度进行更新
                 // const refresh = debounce(this.$refs.scroll.refresh,500);
@@ -107,6 +114,31 @@
             // backClick() {
             //     this.$refs.scroll.BackScroll(0,0,500)
             // },
+            addCart() {
+                // console.log('000')
+                const product = {}
+                product.image = this.topImages[0]
+                product.title = this.goods.title
+                product.desc = this.goods.desc
+                product.price = this.goods.realPrice
+                product.iid = this.iid
+                // console.log(this.goods)
+
+                // this.$store.cartList.push(product)   所有的数据要经过。。，不要直接提交
+                // this.$store.dispatch('addToCart',product).then(res => {
+                //     console.log(res)
+								// })
+								this.addToCart(product).then(res => {
+								    //console.log(res)
+                    // this.message = res
+										// this.show = true
+										// setTimeout(() => {
+										//     this.message = ''
+										//     this.show = false
+										// },1500)
+										this.$toast.show(res)
+								})
+            }
         },
         created() {
             //保存传入的iid
@@ -152,9 +184,10 @@
         /*这个元素的父元素没有定义高度，所以这里时不能使用100\%这个方式来表示的
         用的是position定位中的top和bottom赋值来给元素以高度*/
         /*height: calc(100% - 44px);*/
+        width: 100%;
         overflow: hidden;
 
-        position: absolute;
+        position: fixed;
         top: 44px;
         bottom: 58px;
         /*z-index: 11;*/
@@ -165,7 +198,7 @@
         bottom: 0;
         left: 0;
         right: 0;
-        z-index: 11;
+        z-index: 15;
     }
     .back-top {
         position: fixed;
