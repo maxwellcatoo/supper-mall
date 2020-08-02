@@ -2,7 +2,7 @@
     <div id="detail">
         <nav-bar>
             <div slot="left" @click="detailBack" class="back">
-                <img src="../../../assets/img/common/back.svg" alt="">
+                <img src="../../../assets/img/common/back.svg" alt="图片无法显示">
             </div>
             <div slot="center" class="title">
                 <div v-for="(item,index) in titles"
